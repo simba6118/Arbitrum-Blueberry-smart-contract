@@ -138,7 +138,6 @@ abstract contract MyOwnable is Context {
 contract SportBetting is MyOwnable {
     IERC20 public tokenContract;  // ERC-20 token to be sold
     IERC20 public funTokenContract;  // ERC-20 token to be sold
-    address public admin;
 
     event Bought(string kind, address buyer, uint256 amount);
 
@@ -147,8 +146,7 @@ contract SportBetting is MyOwnable {
         uint256 amount;
     }
 
-    constructor(address _admin, IERC20 _tokenContract, IERC20 _funTokenContract) MyOwnable(msg.sender) {
-        admin = _admin;
+    constructor(IERC20 _tokenContract, IERC20 _funTokenContract) MyOwnable(msg.sender) {
         tokenContract = _tokenContract;
         funTokenContract = _funTokenContract;
     }
@@ -223,31 +221,29 @@ contract SportBetting is MyOwnable {
         return funTokenContract.balanceOf(user);
     }
 
-    // Function to withdraw the game token balance of the contract (admin only)
+    // Function to withdraw the game token balance of the contract (owner() only)
     function withdrawTokenAll() public onlyOwner {
         // Only the deployer of the contract should withdraw the token
-        require(msg.sender == admin, "Only admin can withdraw");
-        tokenContract.transfer(admin, tokenContract.balanceOf(address(this)));
+        tokenContract.transfer(owner(), tokenContract.balanceOf(address(this)));
     }
     
-    // Function to withdraw the fun game token balance of the contract (admin only)
+    // Function to withdraw the fun game token balance of the contract (owner() only)
     function withdrawFunTokenAll() public onlyOwner {
         // Only the deployer of the contract should withdraw the token
-        require(msg.sender == admin, "Only admin can withdraw");
-        funTokenContract.transfer(admin, funTokenContract.balanceOf(address(this)));
+        funTokenContract.transfer(owner(), funTokenContract.balanceOf(address(this)));
     }
     
-    // Function to withdraw the Game Token balance of the contract (admin only)
+    // Function to withdraw the Game Token balance of the contract (owner() only)
     function withdrawToken(uint256 amount) public onlyOwner {
         require(tokenContract.balanceOf(address(this)) >= amount, "Not enough tokens in contract");
-        tokenContract.transfer(admin, amount);
+        tokenContract.transfer(owner(), amount);
         // payable(msg.sender).transfer(address(this).balance);
     }
     
-    // Function to withdraw the Fun Game Token balance of the contract (admin only)
+    // Function to withdraw the Fun Game Token balance of the contract (owner() only)
     function withdrawFunToken(uint256 amount) public onlyOwner {
         require(funTokenContract.balanceOf(address(this)) >= amount, "Not enough tokens in contract");
-        funTokenContract.transfer(admin, amount);
+        funTokenContract.transfer(owner(), amount);
         // payable(msg.sender).transfer(address(this).balance);
     }
     

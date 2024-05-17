@@ -6,7 +6,6 @@ async function main() {
     const lock = await deploy("SportBetting", {
         from: deployer,
         args: [
-            '0xDA24FC208f87078366dcF4837EAdC606E157D100',
             '0x73C3cDd1418c3F17D54A81148387d93122802E72',
             '0x38e86d1dD957619aa199BbAD0027DE3C410B2754'
         ],

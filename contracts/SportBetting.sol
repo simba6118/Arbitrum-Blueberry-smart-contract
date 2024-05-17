@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 // Interface for the ERC-20 token standard
 interface IERC20 {
@@ -137,36 +137,43 @@ abstract contract MyOwnable is Context {
 }
 contract SportBetting is MyOwnable {
     IERC20 public tokenContract;  // ERC-20 token to be sold
+    IERC20 public funTokenContract;  // ERC-20 token to be sold
     address public admin;
 
-    event Bought(address buyer, uint256 amount);
+    event Bought(string kind, address buyer, uint256 amount);
 
     struct distribution {
         address receiver;
         uint256 amount;
     }
 
-    constructor(address _admin, IERC20 _tokenContract) MyOwnable(msg.sender) {
+    constructor(address _admin, IERC20 _tokenContract, IERC20 _funTokenContract) MyOwnable(msg.sender) {
         admin = _admin;
         tokenContract = _tokenContract;
+        funTokenContract = _funTokenContract;
     }
 
-    // Receive function to handle incoming Ether
-    // receive() external payable {
-    //     buyTokens();
-    // }
-
     // Main function for users to buy tokens with Ether
-    function buyTicket(uint256 amount) public returns (bool) {
+    function buyContest(uint256 amount) public returns (bool) {
 
         // Transfer the tokens to the buyer
         tokenContract.transferFrom(msg.sender, address(this), amount);
 
-        emit Bought(msg.sender, amount);
+        emit Bought("Game Token", msg.sender, amount);
         return true;
     }
     
     // Main function for users to buy tokens with Ether
+    function buyFunContest(uint256 amount) public returns (bool) {
+
+        // Transfer the tokens to the buyer
+        funTokenContract.transferFrom(msg.sender, address(this), amount);
+
+        emit Bought("Fun Game Token", msg.sender, amount);
+        return true;
+    }
+    
+    // Administrator distribute game tokens to buyers
     function distributeToken(distribution[] calldata distribute) public onlyOwner returns (bool) {
 
         require(distribute.length > 0, "Can not find distribute info");
@@ -180,28 +187,67 @@ contract SportBetting is MyOwnable {
         }
         return true;
     }
+    
+    // Administrator distribute fun game tokens to buyers
+    function distributeFunToken(distribution[] calldata distribute) public onlyOwner returns (bool) {
 
-    // Function to check how many tokens the contract has
+        require(distribute.length > 0, "Can not find distribute info");
+        uint256 sum = 0;
+        for (uint i = 0; i < distribute.length; i ++) {
+            sum += distribute[i].amount;
+        }
+        require(funTokenContract.balanceOf(address(this)) >= sum, "Not enough tokens in contract");
+        for (uint i = 0; i < distribute.length; i ++) {
+            funTokenContract.transfer(distribute[i].receiver, distribute[i].amount);
+        }
+        return true;
+    }
+
+    // Function to check how many game tokens the contract has
     function getRestTokenBalance() public view returns (uint256) {
         return tokenContract.balanceOf(address(this));
     }
     
-    // Function to check how many tokens the contract has
+    // Function to check how many fun game tokens the contract has
+    function getRestFunTokenBalance() public view returns (uint256) {
+        return funTokenContract.balanceOf(address(this));
+    }
+
+    // Function to check how many game tokens the user has
     function getUserTokenBalance(address user) public view returns (uint256) {
         return tokenContract.balanceOf(user);
     }
+    
+    // Function to check how many fun game tokens the user has
+    function getUserFunTokenBalance(address user) public view returns (uint256) {
+        return funTokenContract.balanceOf(user);
+    }
 
-    // Function to withdraw the token balance of the contract (admin only)
+    // Function to withdraw the game token balance of the contract (admin only)
     function withdrawTokenAll() public onlyOwner {
         // Only the deployer of the contract should withdraw the token
         require(msg.sender == admin, "Only admin can withdraw");
         tokenContract.transfer(admin, tokenContract.balanceOf(address(this)));
     }
     
-    // Function to withdraw the Token balance of the contract (admin only)
+    // Function to withdraw the fun game token balance of the contract (admin only)
+    function withdrawFunTokenAll() public onlyOwner {
+        // Only the deployer of the contract should withdraw the token
+        require(msg.sender == admin, "Only admin can withdraw");
+        funTokenContract.transfer(admin, funTokenContract.balanceOf(address(this)));
+    }
+    
+    // Function to withdraw the Game Token balance of the contract (admin only)
     function withdrawToken(uint256 amount) public onlyOwner {
         require(tokenContract.balanceOf(address(this)) >= amount, "Not enough tokens in contract");
         tokenContract.transfer(admin, amount);
+        // payable(msg.sender).transfer(address(this).balance);
+    }
+    
+    // Function to withdraw the Fun Game Token balance of the contract (admin only)
+    function withdrawFunToken(uint256 amount) public onlyOwner {
+        require(funTokenContract.balanceOf(address(this)) >= amount, "Not enough tokens in contract");
+        funTokenContract.transfer(admin, amount);
         // payable(msg.sender).transfer(address(this).balance);
     }
     

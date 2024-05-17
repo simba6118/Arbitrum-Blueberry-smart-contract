@@ -83,6 +83,32 @@ module.exports = {
   },
 	etherscan: {
 		apiKey: '4457MWYWXNABJSQRI54P14VZ1N8KUG8N57',
+    customChains: [
+      {
+        network: "zkatana",
+        chainId: 1261120,
+        urls: {
+          apiURL: "<API URL of zKatana's block explorer>",
+          browserURL: "<Browser URL of zKatana's block explorer>",
+        },
+      },
+      {
+        network: "unreal",
+        chainId: 18231,
+        urls: {
+          apiURL: "https://unreal.blockscout.com/api",
+          browserURL: "https://unreal.blockscout.com",
+        },
+      },
+      {
+        network: "blueberry",
+        chainId: 88153591557,
+        urls: {
+          apiURL: "https://arb-blueberry.gelatoscout.com/api",
+          browserURL: "https://arb-blueberry.gelatoscout.com/",
+        },
+      },
+    ],
 	},
   networks: {
     goerli: {

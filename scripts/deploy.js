@@ -7,7 +7,8 @@ async function main() {
         from: deployer,
         args: [
             '0xDA24FC208f87078366dcF4837EAdC606E157D100',
-            '0x45b3C87852be9519b6355E14cE7Da9E28726Ec43'
+            '0x73C3cDd1418c3F17D54A81148387d93122802E72',
+            '0x38e86d1dD957619aa199BbAD0027DE3C410B2754'
         ],
         log: true,
         waitConfirmations: 1,
